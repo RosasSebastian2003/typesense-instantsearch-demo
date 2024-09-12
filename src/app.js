@@ -1,62 +1,48 @@
-/* global instantsearch */
-
-import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
+import instantsearch from 'instantsearch.js';
+import { searchBox, hits, pagination, index } from 'instantsearch.js/es/widgets';
+import TypesenseInstantSearchAdapter from 'typesense-instantsearch-adapter';
 
 const typesenseInstantsearchAdapter = new TypesenseInstantSearchAdapter({
   server: {
-    apiKey: "xyz", // Be sure to use an API key that only allows searches, in production
+    apiKey: 'yMFItSjur2ltKLHgGooKRUjdU9twHhI8', // Reemplaza con tu API Key de Typesense
     nodes: [
       {
-        host: "localhost",
-        port: "8108",
-        protocol: "http",
+        host: 'localhost', // Reemplaza con tu host de Typesense
+        port: 8108, // Reemplaza con tu puerto de Typesense
+        protocol: 'http', // Reemplaza con tu protocolo de Typesense
       },
     ],
   },
-  // The following parameters are directly passed to Typesense's search API endpoint.
-  //  So you can pass any parameters supported by the search endpoint below.
-  //  queryBy is required.
-  //  filterBy is managed and overridden by InstantSearch.js. To set it, you want to use one of the filter widgets like refinementList or use the `configure` widget.
   additionalSearchParameters: {
-    queryBy: "title,authors",
+    query_by: 'name', // Reemplaza con los campos por los que deseas buscar
   },
 });
-const { searchClient } = typesenseInstantsearchAdapter;
+
+const searchClient = typesenseInstantsearchAdapter.searchClient;
 
 const search = instantsearch({
+  indexName: 'dishes_view', // Reemplaza con el nombre de tu índice
   searchClient,
-  indexName: "books",
 });
 
 search.addWidgets([
-  instantsearch.widgets.searchBox({
-    container: "#searchbox",
+  searchBox({
+    container: '#searchbox',
+    placeholder: 'Search for products',
   }),
-  instantsearch.widgets.configure({
-    hitsPerPage: 8,
-  }),
-  instantsearch.widgets.hits({
-    container: "#hits",
+  hits({
+    container: '#hits',
     templates: {
-      item(item) {
-        return `
+      item: `
         <div>
-          <img src="${item.image_url}" alt="${item.name}" height="100" />
-          <div class="hit-name">
-            ${item._highlightResult.title.value}
-          </div>
-          <div class="hit-authors">
-          ${item._highlightResult.authors.map((a) => a.value).join(", ")}
-          </div>
-          <div class="hit-publication-year">${item.publication_year}</div>
-          <div class="hit-rating">${item.average_rating}/5 rating</div>
+          <strong>{{#helpers.highlight}}{ "attribute": "name" }{{/helpers.highlight}}</strong>
+          <p>{{#helpers.highlight}}{ "attribute": "description" }{{/helpers.highlight}}</p>
         </div>
-      `;
-      },
+      `,
     },
   }),
-  instantsearch.widgets.pagination({
-    container: "#pagination",
+  pagination({
+    container: '#pagination',
   }),
 ]);
 

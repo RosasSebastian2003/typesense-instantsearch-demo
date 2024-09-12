@@ -26,6 +26,8 @@
     "typesense": "^1.9.0-2"
   },
   "dependencies": {
+    "algoliasearch": "^5.4.1",
+    "instantsearch.js": "^4.74.1",
     "typesense-instantsearch-adapter": "^2.9.0-3"
   },
   "browserslist": [
